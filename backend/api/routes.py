@@ -1,14 +1,28 @@
 """
 FastAPI路由定義
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 
+from config.settings import settings
 from models.database import get_db
 from coordinator.agent_coordinator import coordinator
 
 router = APIRouter()
+
+# 安全性設定 - 簡單 API Key 驗證
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def verify_api_key(api_key: str = Security(api_key_header)):
+    """驗證管理 API 金鑰"""
+    if not api_key or api_key != settings.admin_api_key:
+        raise HTTPException(
+            status_code=403,
+            detail="無效的 API 金鑰"
+        )
+    return api_key
 
 
 @router.get("/")
@@ -28,9 +42,12 @@ async def health_check():
 
 
 @router.post("/collect")
-async def trigger_collection(db: Session = Depends(get_db)):
+async def trigger_collection(
+    db: Session = Depends(get_db),
+    api_key: str = Depends(verify_api_key)
+):
     """
-    手動觸發一次數據採集
+    手動觸發一次數據採集 (需要 API Key)
     
     執行完整的流水線：數據採集 -> 分析 -> AI分析
     """

@@ -32,7 +32,8 @@ class Settings:
         self.refresh_interval = int(os.getenv("REFRESH_INTERVAL", "120"))  # 2分鐘
         self.timezone = os.getenv("TIMEZONE", "Asia/Taipei")
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
-        
+        self.admin_api_key = os.getenv("ADMIN_API_KEY", "your-secret-api-key")  # API保護金鑰
+
         # Server
         self.backend_url = os.getenv("BACKEND_URL", "http://localhost:8000")
         self.frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")

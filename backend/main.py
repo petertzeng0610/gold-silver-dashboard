@@ -6,6 +6,8 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware  # 新增
+from fastapi.middleware.gzip import GZipMiddleware  # 新增
 
 from config.settings import settings
 from models.database import init_db, get_db
@@ -83,9 +85,19 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],  # 限制為僅使用 GET 和 POST
     allow_headers=["*"],
 )
+
+# 增加 TrustedHostMiddleware 保護 Host Header Injection
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["*"]  # 部署後建議修改為具體域名，例如 ["api.zeabur.app", "localhost"]
+)
+
+# 增加 GZip 壓縮回應，優化傳輸速度
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 
 # 註冊路由
 app.include_router(router, prefix="/api", tags=["api"])
