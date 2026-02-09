@@ -1,0 +1,70 @@
+/**
+ * API服務 - 與後端通訊
+ */
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    timeout: 10000,
+});
+
+export const apiService = {
+    /**
+     * 獲取最新綜合數據
+     */
+    async getLatestData() {
+        const response = await api.get('/latest');
+        return response.data;
+    },
+
+    /**
+     * 獲取歷史數據
+     * @param {number} days - 獲取最近幾天的數據
+     */
+    async getHistoricalData(days = 30) {
+        const response = await api.get('/history', { params: { days } });
+        return response.data;
+    },
+
+    /**
+     * 獲取當前價格
+     */
+    async getCurrentPrices() {
+        const response = await api.get('/prices/current');
+        return response.data;
+    },
+
+    /**
+     * 獲取月度統計
+     */
+    async getMonthlyStatistics() {
+        const response = await api.get('/statistics/monthly');
+        return response.data;
+    },
+
+    /**
+     * 獲取最新AI分析
+     */
+    async getLatestAIAnalysis() {
+        const response = await api.get('/ai-analysis/latest');
+        return response.data;
+    },
+
+    /**
+     * 手動觸發數據採集
+     */
+    async triggerCollection() {
+        const response = await api.post('/collect');
+        return response.data;
+    },
+
+    /**
+     * 健康檢查
+     */
+    async healthCheck() {
+        const response = await api.get('/health');
+        return response.data;
+    },
+};
