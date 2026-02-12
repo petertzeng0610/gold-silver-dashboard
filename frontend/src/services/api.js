@@ -3,10 +3,15 @@
  */
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// 如果 VITE_API_URL 包含網域但漏了 http/https，自動補上 https (解決 Zeabur URL 常見問題)
+if (baseURL && !baseURL.startsWith('http') && baseURL.includes('.')) {
+    baseURL = `https://${baseURL}`;
+}
 
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: baseURL,
     timeout: 10000,
 });
 

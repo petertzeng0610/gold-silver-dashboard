@@ -166,16 +166,16 @@ function App() {
             {/* Ticker Section - Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <PriceCard
-                    title="黃金 (XAU/USD)"
-                    price={prices?.gold_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    title="黃金 (TWD/錢)"
+                    price={prices?.gold_price?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     change={goldChangeStr}
                     isUp={goldChangeVal >= 0}
                     colorCode="text-yellow-400"
                     icon={<Zap size={14} className="text-yellow-500" />}
                 />
                 <PriceCard
-                    title="白銀 (XAG/USD)"
-                    price={prices?.silver_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    title="白銀 (TWD/錢)"
+                    price={prices?.silver_price?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     change={silverChangeStr}
                     isUp={silverChangeVal >= 0}
                     colorCode="text-slate-200"

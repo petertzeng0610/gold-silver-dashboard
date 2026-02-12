@@ -16,8 +16,8 @@ const CustomTooltip = ({ active, payload, label }) => {
         return (
             <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-lg shadow-xl text-xs">
                 <p className="text-slate-400 mb-1">{label}</p>
-                <p className="text-yellow-400 font-mono font-bold">Gold: ${payload[0].value.toFixed(2)}</p>
-                <p className="text-slate-300 font-mono font-bold">Silver: ${payload[1].value.toFixed(2)}</p>
+                <p className="text-yellow-400 font-mono font-bold">黃金: NT$ {payload[0].value.toLocaleString()}</p>
+                <p className="text-slate-300 font-mono font-bold">白銀: NT$ {payload[1].value.toLocaleString()}</p>
             </div>
         );
     }

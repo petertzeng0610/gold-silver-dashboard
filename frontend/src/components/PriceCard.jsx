@@ -35,7 +35,7 @@ const PriceCard = ({ title, price, change, isUp, colorCode, icon }) => {
     }, [price, isUp]);
 
     // Determine specific styles based on metal type
-    const isGold = title.includes('GOLD');
+    const isGold = title.includes('黃金') || title.includes('Gold');
     // Gradient border logic: Gold gets yellow/orange, Silver gets white/blue
     const borderClass = isGold
         ? "border-yellow-500/30 group-hover:border-yellow-400/50"
@@ -81,7 +81,7 @@ const PriceCard = ({ title, price, change, isUp, colorCode, icon }) => {
 
                     <div>
                         <div className={clsx("text-4xl font-bold tracking-tight mb-2 tabular-nums", colorCode)}>
-                            <span className="text-2xl opacity-50 mr-1">$</span>{price}
+                            <span className="text-xl opacity-50 mr-1">NT$</span>{price}
                         </div>
 
                         <div className={clsx(
