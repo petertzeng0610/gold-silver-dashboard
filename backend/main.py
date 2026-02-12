@@ -43,6 +43,18 @@ async def lifespan(app: FastAPI):
     logger.info("初始化數據庫...")
     init_db()
     logger.info("✓ 數據庫初始化完成")
+
+    # 立即執行一次採集，確保啟動後即有資料
+    logger.info("執行啟動時立即採集...")
+    async def run_initial_collection():
+        from models.database import SessionLocal
+        db = SessionLocal()
+        try:
+            await coordinator.execute_pipeline(db)
+        finally:
+            db.close()
+    
+    asyncio.create_task(run_initial_collection())
     
     # 啟動後台定時任務
     logger.info("啟動定時採集任務...")

@@ -30,15 +30,62 @@ async def root():
     """根路徑"""
     return {
         "message": "台灣金銀價格追蹤與分析系統 API",
-        "version": "1.0.0",
-        "status": "運行中"
+        "version": "1.1.1",
+        "status": "運行中",
+        "last_build": "2026-02-12 17:02 (Sync Fix)"
     }
+
+
+@router.get("/version")
+async def get_version():
+    """獲獲取版本號 (驗證部署用)"""
+    return {"version": "1.1.1", "env": "production"}
 
 
 @router.get("/health")
 async def health_check():
     """健康檢查"""
     return {"status": "healthy", "coordinator_running": coordinator.is_running}
+
+
+@router.get("/debug/state")
+async def get_debug_state(db: Session = Depends(get_db)):
+    """獲取調試狀態 (不需要 Key)"""
+    from models.database import PriceRecord, StatisticsRecord, AIAnalysisRecord
+    
+    counts = {
+        "price_records": db.query(PriceRecord).count(),
+        "statistics_records": db.query(StatisticsRecord).count(),
+        "ai_analysis_records": db.query(AIAnalysisRecord).count()
+    }
+    
+    return {
+        "status": "success",
+        "database_url_configured": settings.database_url != "sqlite:///./gold_silver.db",
+        "gemini_api_key_configured": bool(settings.gemini_api_key),
+        "data_counts": counts,
+        "coordinator_running": coordinator.is_running
+    }
+
+
+@router.get("/debug/collect")
+async def debug_collect(db: Session = Depends(get_db)):
+    """
+    公開的調試採集接口 (方便 Zeabur 測試)
+    執行完整的流水線並詳細返回結果
+    """
+    try:
+        result = await coordinator.execute_pipeline(db)
+        return {
+            "status": "success" if result["success"] else "failed",
+            "pipeline_result": {
+                "success": result["success"],
+                "errors": result["errors"],
+                "data_captured": list(result["data"].keys())
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 
 @router.post("/collect")

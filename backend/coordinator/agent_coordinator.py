@@ -192,8 +192,8 @@ class AgentCoordinator:
             }
             
         except Exception as e:
-            logger.error(f"[{self.name}] 獲取最新數據失敗: {str(e)}")
-            return {}
+            logger.error(f"[{self.name}] 獲取最新數據失敗: {str(e)}", exc_info=True)
+            return {"error": str(e), "note": "這通常意味著數據庫表結構與程式碼不一致，或者是數據庫為空且獲取邏輯出錯"}
     
     async def get_historical_data(
         self, 
