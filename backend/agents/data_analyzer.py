@@ -38,19 +38,22 @@ class DataAnalyzerAgent:
         
         if not records:
             logger.warning("沒有足夠的數據計算月平均")
-            return {"gold_avg": 0, "silver_avg": 0}
+            return {"gold_avg": 0, "silver_avg": 0, "platinum_avg": 0}
         
         gold_prices = [r.gold_price for r in records]
         silver_prices = [r.silver_price for r in records]
         
-        gold_avg = round(np.mean(gold_prices), 2)
-        silver_avg = round(np.mean(silver_prices), 2)
+        gold_avg = round(float(np.mean(gold_prices or [0])), 2)
+        silver_avg = round(float(np.mean(silver_prices or [0])), 2)
+        platinum_prices = [r.platinum_price for r in records if r.platinum_price is not None]
+        platinum_avg = round(float(np.mean(platinum_prices or [0])), 2)
         
-        logger.info(f"[{self.name}] 月平均 - 金: {gold_avg}, 銀: {silver_avg}")
+        logger.info(f"[{self.name}] 月平均 - 金: {gold_avg}, 銀: {silver_avg}, 白金: {platinum_avg}")
         
         return {
             "gold_avg": gold_avg,
-            "silver_avg": silver_avg
+            "silver_avg": silver_avg,
+            "platinum_avg": platinum_avg
         }
     
     def calculate_statistics(self, db: Session) -> Dict[str, Any]:
@@ -79,11 +82,24 @@ class DataAnalyzerAgent:
             "median": round(float(np.median(silver_prices)), 2),
         }
         
+        platinum_prices = np.array([r.platinum_price for r in records if r.platinum_price is not None])
+        if platinum_prices.size > 0:
+            platinum_stats = {
+                "avg": round(float(np.mean(platinum_prices)), 2),
+                "max": round(float(np.max(platinum_prices)), 2),
+                "min": round(float(np.min(platinum_prices)), 2),
+                "std": round(float(np.std(platinum_prices)), 2),
+                "median": round(float(np.median(platinum_prices)), 2),
+            }
+        else:
+            platinum_stats = {"avg": 0, "max": 0, "min": 0, "std": 0, "median": 0}
+        
         logger.info(f"[{self.name}] 統計分析完成")
         
         return {
             "gold": gold_stats,
             "silver": silver_stats,
+            "platinum": platinum_stats,
             "period": "monthly",
             "data_points": len(records),
             "timestamp": datetime.now()
@@ -187,6 +203,10 @@ class DataAnalyzerAgent:
                 silver_max=stats["silver"]["max"],
                 silver_min=stats["silver"]["min"],
                 silver_std=stats["silver"]["std"],
+                platinum_avg=stats["platinum"]["avg"],
+                platinum_max=stats["platinum"]["max"],
+                platinum_min=stats["platinum"]["min"],
+                platinum_std=stats["platinum"]["std"],
             )
             
             db.add(record)

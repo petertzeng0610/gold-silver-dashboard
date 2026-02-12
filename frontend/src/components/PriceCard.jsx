@@ -27,9 +27,6 @@ const PriceCard = ({ title, price, change, isUp, colorCode, icon }) => {
             const timer = setTimeout(() => setFlash(null), 500);
             prevPriceRef.current = price;
 
-            // Update sparkline on price change
-            setSparkData(prev => [...prev.slice(1), { value: 50 + Math.random() * 20 }]);
-
             return () => clearTimeout(timer);
         }
     }, [price, isUp]);

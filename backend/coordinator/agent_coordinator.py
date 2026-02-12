@@ -221,16 +221,19 @@ class AgentCoordinator:
             timestamps = []
             gold_prices = []
             silver_prices = []
+            platinum_prices = []
             
             for record in records:
                 timestamps.append(record.timestamp.isoformat())
                 gold_prices.append(record.gold_price)
                 silver_prices.append(record.silver_price)
+                platinum_prices.append(record.platinum_price)
             
             return {
                 "timestamps": timestamps,
                 "gold_prices": gold_prices,
                 "silver_prices": silver_prices,
+                "platinum_prices": platinum_prices,
                 "count": len(records)
             }
             

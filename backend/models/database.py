@@ -18,6 +18,7 @@ class PriceRecord(Base):
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
     gold_price = Column(Float, nullable=False, comment="金價 (TWD/錢)")
     silver_price = Column(Float, nullable=False, comment="銀價 (TWD/錢)")
+    platinum_price = Column(Float, nullable=True, comment="白金牌價 (TWD/錢)")
     source = Column(String(100), comment="數據來源")
     created_at = Column(DateTime, default=datetime.utcnow)
     
@@ -27,6 +28,7 @@ class PriceRecord(Base):
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
             "gold_price": self.gold_price,
             "silver_price": self.silver_price,
+            "platinum_price": self.platinum_price,
             "source": self.source,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
@@ -52,6 +54,12 @@ class StatisticsRecord(Base):
     silver_min = Column(Float, comment="銀價最低")
     silver_std = Column(Float, comment="銀價標準差")
     
+    # 白金統計
+    platinum_avg = Column(Float, comment="白金平均")
+    platinum_max = Column(Float, comment="白金最高")
+    platinum_min = Column(Float, comment="白金最低")
+    platinum_std = Column(Float, comment="白金標準差")
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -70,6 +78,12 @@ class StatisticsRecord(Base):
                 "max": self.silver_max,
                 "min": self.silver_min,
                 "std": self.silver_std,
+            },
+            "platinum": {
+                "avg": self.platinum_avg,
+                "max": self.platinum_max,
+                "min": self.platinum_min,
+                "std": self.platinum_std,
             },
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

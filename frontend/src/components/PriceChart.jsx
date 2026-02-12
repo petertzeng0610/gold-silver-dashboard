@@ -7,7 +7,8 @@ const generateData = (points = 30) => {
     return Array.from({ length: points }, (_, i) => ({
         time: `10:${i < 10 ? '0' + i : i}`,
         gold: 2020 + Math.random() * 10,
-        silver: 22 + Math.random() * 1
+        silver: 22 + Math.random() * 1,
+        platinum: 850 + Math.random() * 5
     }));
 };
 
@@ -16,8 +17,9 @@ const CustomTooltip = ({ active, payload, label }) => {
         return (
             <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-lg shadow-xl text-xs">
                 <p className="text-slate-400 mb-1">{label}</p>
-                <p className="text-yellow-400 font-mono font-bold">黃金: NT$ {payload[0].value.toLocaleString()}</p>
-                <p className="text-slate-300 font-mono font-bold">白銀: NT$ {payload[1].value.toLocaleString()}</p>
+                <p className="text-yellow-400 font-mono font-bold">黃金: NT$ {payload[0]?.value?.toLocaleString()}</p>
+                <p className="text-slate-300 font-mono font-bold">白銀: NT$ {payload[1]?.value?.toLocaleString()}</p>
+                {payload[2] && <p className="text-sky-400 font-mono font-bold">白金: NT$ {payload[2].value.toLocaleString()}</p>}
             </div>
         );
     }
@@ -67,6 +69,10 @@ const PriceChart = ({ historicalData, period, onPeriodChange }) => {
                                 <stop offset="5%" stopColor="#e2e8f0" stopOpacity={0.2} />
                                 <stop offset="95%" stopColor="#e2e8f0" stopOpacity={0} />
                             </linearGradient>
+                            <linearGradient id="colorPlatinum" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#7dd3fc" stopOpacity={0.2} />
+                                <stop offset="95%" stopColor="#7dd3fc" stopOpacity={0} />
+                            </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.2} vertical={false} />
                         <XAxis
@@ -103,6 +109,15 @@ const PriceChart = ({ historicalData, period, onPeriodChange }) => {
                             fillOpacity={1}
                             fill="url(#colorSilver)"
                             activeDot={{ r: 6, fill: "#e2e8f0", stroke: "#fff", strokeWidth: 2 }}
+                        />
+                        <Area
+                            type="monotone"
+                            dataKey="platinum"
+                            stroke="#7dd3fc"
+                            strokeWidth={2}
+                            fillOpacity={1}
+                            fill="url(#colorPlatinum)"
+                            activeDot={{ r: 6, fill: "#7dd3fc", stroke: "#fff", strokeWidth: 2 }}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Activity, Zap, Server } from 'lucide-react';
+import { motion } from 'framer-motion';
 import PriceCard from './components/PriceCard';
 import PriceChart from './components/PriceChart';
 import AnalysisSection from './components/AnalysisSection';
@@ -30,17 +31,20 @@ function App() {
                 apiService.getHistoricalData(days),
             ]);
 
-            if (latest.status === 'success') setLatestData(latest.data);
+            if (latest.status === 'success') {
+                setLatestData(latest.data);
+            }
             if (historical.status === 'success') {
                 // Transform backend data (separate arrays) to Recharts format (array of objects)
-                const { timestamps, gold_prices, silver_prices } = historical.data;
+                const { timestamps, gold_prices, silver_prices, platinum_prices } = historical.data;
                 if (timestamps && gold_prices && silver_prices) {
                     const formattedData = timestamps.map((time, index) => {
                         const date = new Date(time);
                         return {
                             time: date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
                             gold: gold_prices[index],
-                            silver: silver_prices[index]
+                            silver: silver_prices[index],
+                            platinum: platinum_prices ? platinum_prices[index] : null
                         };
                     });
                     setHistoricalData(formattedData);
@@ -53,7 +57,7 @@ function App() {
         } finally {
             setLoading(false);
         }
-    }, [latestData, period]); // Depend on period
+    }, [period]); // Removed latestData to prevent infinite loop
 
     useEffect(() => {
         loadData();
@@ -125,18 +129,27 @@ function App() {
     // Calculate previous prices from history for trend (using transformed data)
     const prevGold = historicalData?.length > 1 ? historicalData[historicalData.length - 2].gold : prices?.gold_price;
     const prevSilver = historicalData?.length > 1 ? historicalData[historicalData.length - 2].silver : prices?.silver_price;
+    const prevPlatinum = historicalData?.length > 1 ? historicalData[historicalData.length - 2].platinum : prices?.platinum_price;
 
     const goldChangeVal = prices?.gold_price && prevGold ? (prices.gold_price - prevGold) : 0;
     const silverChangeVal = prices?.silver_price && prevSilver ? (prices.silver_price - prevSilver) : 0;
+    const platinumChangeVal = prices?.platinum_price && prevPlatinum ? (prices.platinum_price - prevPlatinum) : 0;
 
     const goldPercent = prevGold ? ((goldChangeVal / prevGold) * 100).toFixed(2) : '0.00';
     const silverPercent = prevSilver ? ((silverChangeVal / prevSilver) * 100).toFixed(2) : '0.00';
+    const platinumPercent = prevPlatinum ? ((platinumChangeVal / prevPlatinum) * 100).toFixed(2) : '0.00';
 
     const goldChangeStr = `${goldChangeVal >= 0 ? '+' : ''}${goldPercent}%`;
     const silverChangeStr = `${silverChangeVal >= 0 ? '+' : ''}${silverPercent}%`;
+    const platinumChangeStr = `${platinumChangeVal >= 0 ? '+' : ''}${platinumPercent}%`;
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 space-y-6 font-sans">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 space-y-6 font-sans"
+        >
 
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -164,7 +177,7 @@ function App() {
             </header>
 
             {/* Ticker Section - Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <PriceCard
                     title="黃金 (TWD/錢)"
                     price={prices?.gold_price?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -180,6 +193,14 @@ function App() {
                     isUp={silverChangeVal >= 0}
                     colorCode="text-slate-200"
                     icon={<Server size={14} className="text-slate-400" />}
+                />
+                <PriceCard
+                    title="白金 (TWD/錢)"
+                    price={prices?.platinum_price?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    change={platinumChangeStr}
+                    isUp={platinumChangeVal >= 0}
+                    colorCode="text-sky-300"
+                    icon={<Activity size={14} className="text-sky-400" />}
                 />
             </div>
 
@@ -206,7 +227,7 @@ function App() {
                     />
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
