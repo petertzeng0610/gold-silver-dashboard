@@ -9,6 +9,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - PORT=8000
       - DATABASE_URL=postgresql://postgres:password@db:5432/gold_silver_db
       - REDIS_URL=redis://redis:6379/0
       - GEMINI_API_KEY=${GEMINI_API_KEY}

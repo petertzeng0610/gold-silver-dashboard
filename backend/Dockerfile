@@ -17,8 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 複製其餘代碼
 COPY . .
 
-# 暴露端口
+# 暴露預設端口
 EXPOSE 8000
 
-# 啟動命令
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 使用環境變數啟動，若無 PORT 變數則預設 8000
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
