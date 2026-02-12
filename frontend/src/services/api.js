@@ -56,7 +56,13 @@ export const apiService = {
      * 手動觸發數據採集
      */
     async triggerCollection() {
-        const response = await api.post('/collect');
+        // Use API Key from env or default
+        const apiKey = import.meta.env.VITE_ADMIN_API_KEY || 'your-secret-api-key';
+        const response = await api.post('/collect', {}, {
+            headers: {
+                'X-API-Key': apiKey
+            }
+        });
         return response.data;
     },
 
