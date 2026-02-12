@@ -12,12 +12,15 @@ services:
       - DATABASE_URL=postgresql://postgres:password@db:5432/gold_silver_db
       - REDIS_URL=redis://redis:6379/0
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-your-secret-api-key}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      - LOG_LEVEL=INFO
     depends_on:
       - db
       - redis
     volumes:
       - ./backend:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    restart: always
 
   # 前端服務
   frontend:
@@ -25,11 +28,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host
+      - "80:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+    restart: always
 
   # PostgreSQL數據庫
   db:
